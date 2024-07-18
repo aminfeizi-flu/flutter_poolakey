@@ -111,18 +111,29 @@ class FlutterPoolakeyPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
         val paymentConfiguration = PaymentConfiguration(localSecurityCheck = securityCheck)
 
         payment = Payment(context = requireActivity, config = paymentConfiguration)
-
         paymentConnection = payment.connect {
             connectionSucceed {
-                result.success(true)
+                channel.invokeMethod("connectSuccess", null)
             }
             connectionFailed {
-                result.error("CONNECTION_HAS_FAILED", it.toString(), null)
+                channel.invokeMethod("connectFailed", null)
             }
             disconnected {
                 channel.invokeMethod("disconnected", null)
             }
         }
+
+//        paymentConnection = payment.connect {
+//            connectionSucceed {
+//                result.success(true)
+//            }
+//            connectionFailed {
+//                result.error("CONNECTION_HAS_FAILED", it.toString(), null)
+//            }
+//            disconnected {
+//                channel.invokeMethod("disconnected", null)
+//            }
+//        }
     }
 
     private fun disconnect(result: Result){
