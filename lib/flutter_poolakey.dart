@@ -32,6 +32,37 @@ class FlutterPoolakey {
   ///
   /// This function may return an error, you should handle the error and check the stacktrace to resolve it.
   static Future<bool> connect(String? inAppBillingKey,
+      {VoidCallback? onConnectSuccess,
+        VoidCallback? onConnectFailed,
+        VoidCallback? onDisconnected}) async {
+    _registerConnectCallBack(onConnectSuccess, onConnectFailed, onDisconnected);
+   return await _channel
+        .invokeMethod('connect', {'in_app_billing_key': inAppBillingKey});
+  }
+
+  static void _registerConnectCallBack(VoidCallback? onConnectSuccess,
+      VoidCallback? onConnectFailed, VoidCallback? onDisconnected) {
+    if (onConnectSuccess == null &&
+        onConnectFailed == null &&
+        onDisconnected == null) {
+      return;
+    }
+    _channel.setMethodCallHandler((call) {
+      if (call.method == 'disconnected') {
+        onDisconnected?.call();
+        return Future.value(true);
+      } else if (call.method == 'connectSuccess') {
+        onConnectSuccess?.call();
+        return Future.value(true);
+      } else if (call.method == 'connectFailed') {
+        onConnectFailed?.call();
+        return Future.value(true);
+      }
+      throw StateError('method ${call.method} is not supported');
+    });
+  }
+
+  /* static Future<bool> connect(String? inAppBillingKey,
       {VoidCallback? onDisconnected}) async {
     _registerOnDisconnect(onDisconnected);
     return await _channel
@@ -49,7 +80,7 @@ class FlutterPoolakey {
       }
       throw StateError('method ${call.method} is not supported');
     });
-  }
+  }*/
 
 
   ///To avoid problems such as Memory Leak, 
