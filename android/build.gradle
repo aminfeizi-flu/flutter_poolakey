@@ -39,6 +39,7 @@ apply plugin: 'kotlin-android'
 
 android {
     compileSdkVersion 33
+     namespace = "ir.cafebazaar.flutter_poolakey"
   buildFeatures {
         buildConfig = true
     }
